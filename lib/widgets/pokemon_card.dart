@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pokedex/data/model/pokemon.dart';
 import 'package:pokedex/utils/utils.dart';
@@ -85,19 +86,19 @@ class PokemonCard extends StatelessWidget {
               ),
               TwoText(
                 txt1: "Evolucion",
-                txt2: pokemon.involvesTo.toString(),
+                txt2: pokemon.involvesTo,
               ),
               TwoText(
                 txt1: "Ataques",
-                txt2: pokemon.attacks.toString(),
+                txt2: pokemon.attacks,
               ),
               TwoText(
                 txt1: "Habilidades",
-                txt2: pokemon.abilities.toString(),
+                txt2: pokemon.abilities,
               ),
               TwoText(
                 txt1: "Donde encontrar",
-                txt2: pokemon.locationAreaEncounters.toString(),
+                txt2: pokemon.locationAreaEncounters,
               ),
             ],
           ),
@@ -148,11 +149,11 @@ class PokemonCard extends StatelessWidget {
     );
   }
 
-  FadeInImage getImage() {
-    return FadeInImage.assetNetwork(
-      placeholder: "assets/gif/pokeball_gif.gif",
-      image: pokemon.picture!,
-      fit: BoxFit.contain,
-    );
+  CachedNetworkImage getImage() {
+    return CachedNetworkImage(
+        imageUrl: pokemon.picture!,
+        placeholder: (context, url) => Utils.imageAssetPokeBall,
+        errorWidget: (context, url, error) => Utils.imageAssetPokeBall,
+     );
   }
 }

@@ -1,7 +1,9 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:mobx/mobx.dart';
 import 'package:pokedex/data/api/models/pokemon_data_default.dart';
 import 'package:pokedex/data/api/models/pokemon_urls.dart';
 import 'package:pokedex/data/api/services/api.dart';
+import 'package:pokedex/data/db/services/pokemons_services.dart';
 import 'package:pokedex/data/model/pokemon.dart';
 
 // Include generated file
@@ -14,6 +16,13 @@ class AppManagement = _AppManagement with _$AppManagement;
 // The store-class
 abstract class _AppManagement with Store {
   @observable
+  bool isOffline = false;
+
+  @observable
+  ObservableStream<ConnectivityResult> connectivityStream =
+      ObservableStream(Connectivity().onConnectivityChanged);
+
+  @observable
   ObservableFuture<PokemonUrls?>? asyncPokemonUrlsController;
 
   @observable
@@ -24,50 +33,52 @@ abstract class _AppManagement with Store {
 
   @action
   Future<void> setAsyncPokemons() async {
-    asyncPokemonUrlsController = ObservableFuture(Api.pokemonUrls());
+    List<Pokemon> pkmsInDB = await PokemonsServices.pokemonsInDB;
+    if (isOffline || pkmsInDB.isNotEmpty) {
+      pokemons = pkmsInDB;
+    } else {
+      asyncPokemonUrlsController = ObservableFuture(Api.pokemonUrls());
 
-    pokemonUrls = await asyncPokemonUrlsController;
+      pokemonUrls = await asyncPokemonUrlsController;
 
-    if (pokemonUrls != null) {
-      List<Pokemon> pkms = [];
-      await Future.forEach(pokemonUrls!.results!, (pokemon) async {
-        PokemonDataDefault? pokemonDD;
-        String? type;
-        List<String>? abilities;
-        //TODO: Hacer peticion correspondiente a estos datos
-        List<String>? involvesTo;
-        List<String>? attacks;
-        List<String>? locationAreaEncounters;
-        try {
-          pokemonDD = await Api.pokemon(pokemon.id!);
-          if (pokemonDD != null) {
-            abilities =
-                pokemonDD.abilities!.map((a) => a.ability!.name!).toList();
-            type =
-                pokemonDD.types!.map((t) => t.type!.name!).toList().toString();
-            //TODO: este dato contiene la url para obtener las locaciones - pokemonDD.locationAreaEncounters!
+      if (pokemonUrls != null) {
+        List<Pokemon> pkms = [];
+        await Future.forEach(pokemonUrls!.results!, (pokemon) async {
+          PokemonDataDefault? pokemonDD;
+          String? type;
+          String? abilities;
+          //TODO: Hacer peticion correspondiente a estos datos
+          String? involvesTo;
+          String? attacks;
+          String? locationAreaEncounters;
+          bool isError = false;
+          try {
+            pokemonDD = await Api.pokemon(pokemon.id!);
+          } catch (e) {
+            pokemonDD = null;
+            isError = true;
           }
-        } catch (e) {
-          pokemonDD = null;
-        }
 
-        pkms.add(
-          Pokemon(
-            pokemon.name!,
-            id: pokemon.id,
-            picture: "${Api.baseUrlPicture}${pokemon.id}.png",
-            abilities: abilities,
-            type: type,
-          ),
-        );
-        pokemons = pkms;
-      });
+          if (isError == false) {
+            if (pokemonDD != null) {
+              abilities =
+                  pokemonDD.abilities!.map((a) => a.ability!.name!).toString();
+              type = pokemonDD.types!.map((t) => t.type!.name!).toString();
+              //TODO: este dato contiene la url para obtener las locaciones - pokemonDD.locationAreaEncounters!
+            }
+            pkms.add(
+              Pokemon(
+                id: pokemon.id!,
+                name: pokemon.name!,
+                picture: "${Api.baseUrlPicture}${pokemon.id}.png",
+                abilities: abilities,
+                type: type,
+              ),
+            );
+            pokemons = pkms;
+          }
+        });
+      }
     }
   }
-
-  /*@computed
-  Future<bool> get isOffline async =>
-      (connectionStatus != SocketStatus.online &&
-          (await DBService.dbIsEmpty()) == false);*/
-
 }

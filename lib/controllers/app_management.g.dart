@@ -9,6 +9,38 @@ part of 'app_management.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$AppManagement on _AppManagement, Store {
+  late final _$isOfflineAtom =
+      Atom(name: '_AppManagement.isOffline', context: context);
+
+  @override
+  bool get isOffline {
+    _$isOfflineAtom.reportRead();
+    return super.isOffline;
+  }
+
+  @override
+  set isOffline(bool value) {
+    _$isOfflineAtom.reportWrite(value, super.isOffline, () {
+      super.isOffline = value;
+    });
+  }
+
+  late final _$connectivityStreamAtom =
+      Atom(name: '_AppManagement.connectivityStream', context: context);
+
+  @override
+  ObservableStream<ConnectivityResult> get connectivityStream {
+    _$connectivityStreamAtom.reportRead();
+    return super.connectivityStream;
+  }
+
+  @override
+  set connectivityStream(ObservableStream<ConnectivityResult> value) {
+    _$connectivityStreamAtom.reportWrite(value, super.connectivityStream, () {
+      super.connectivityStream = value;
+    });
+  }
+
   late final _$asyncPokemonUrlsControllerAtom =
       Atom(name: '_AppManagement.asyncPokemonUrlsController', context: context);
 
@@ -69,6 +101,8 @@ mixin _$AppManagement on _AppManagement, Store {
   @override
   String toString() {
     return '''
+isOffline: ${isOffline},
+connectivityStream: ${connectivityStream},
 asyncPokemonUrlsController: ${asyncPokemonUrlsController},
 pokemonUrls: ${pokemonUrls},
 pokemons: ${pokemons}

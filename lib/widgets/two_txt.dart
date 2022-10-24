@@ -29,7 +29,7 @@ class TwoText extends StatelessWidget {
         (widget != null)
             ? widget!
             : Text(
-                txt2!,
+                txt2 == null ? "" : txt2!,
                 style: TextStyle(fontSize: fontSize),
               ),
       ],

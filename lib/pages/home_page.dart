@@ -5,6 +5,7 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:mobx/mobx.dart';
 import 'package:pokedex/controllers/app_management.dart';
 import 'package:pokedex/data/model/pokemon.dart';
+import 'package:pokedex/utils/utils.dart';
 import 'package:pokedex/widgets/pokemon_card.dart';
 
 // ignore: must_be_immutable
@@ -14,8 +15,7 @@ class HomePage extends StatelessWidget {
       GlobalKey<LiquidPullToRefreshState>();
   String searchText = "";
   // ignore: prefer_final_fields
-  TextEditingController _controller =
-      TextEditingController(text: "");
+  TextEditingController _controller = TextEditingController(text: "");
   HomePage({super.key, required this.aMgnt});
 
   @override
@@ -47,15 +47,16 @@ class HomePage extends StatelessWidget {
       body: LiquidPullToRefresh(
         color: Colors.red,
         backgroundColor: Colors.black,
-        onRefresh: () => init(),
+        onRefresh: () => Utils.init(aMgnt),
         key: refreshIndicatorKey,
         child: Observer(builder: (context) {
-          if (aMgnt.asyncPokemonUrlsController == null ||
-              aMgnt.pokemons == null) {
+          if (aMgnt.pokemons == null) {
             return ListView();
           }
-          if (aMgnt.asyncPokemonUrlsController!.status ==
-              FutureStatus.pending) {
+
+          if (aMgnt.asyncPokemonUrlsController != null &&
+              aMgnt.asyncPokemonUrlsController!.status ==
+                  FutureStatus.pending) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -63,6 +64,7 @@ class HomePage extends StatelessWidget {
               ),
             );
           }
+
           return GridView.builder(
             itemCount: aMgnt.pokemons!.length,
             itemBuilder: (BuildContext context, int index) {
@@ -78,7 +80,4 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Future<void> init() async {
-    aMgnt.setAsyncPokemons();
-  }
 }

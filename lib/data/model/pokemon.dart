@@ -1,16 +1,23 @@
+import 'package:floor/floor.dart';
+/*
+*Este modelo nos sirve tanto para insertar en la base
+* de datos local como para las peticiones a la 
+*/
+@Entity(tableName: "Pokemons")
 class Pokemon {
+  @PrimaryKey()
+  final int id;
   final String name;
-  final int? id;
   final String? type;
-  final List<String>? involvesTo;
-  final List<String>? attacks;
-  final List<String>? abilities;
-  final List<String>? locationAreaEncounters;
+  final String? involvesTo;
+  final String? attacks;
+  final String? abilities;
+  final String? locationAreaEncounters;
   final String? picture;
 
-  Pokemon(
-    this.name, {
-    this.id,
+  Pokemon({
+    required this.id,
+    required this.name,
     this.type,
     this.involvesTo,
     this.attacks,
