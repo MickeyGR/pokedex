@@ -1,16 +1,19 @@
 # pokedex
 
-A new Flutter project.
+Este proyecto está desarrollado con Flutter y consumiendo PokeAPI
 
-## Getting Started
+## ¿Cómo probar el proyecto?
+**Entra a la carpeta de la api y hace lo siguiente:**
 
-This project is a starting point for a Flutter application.
+```bash
+cd pokedex/
+flutter clean
+flutter pub get
+flutter run
+```
+## Tecnologias usadas
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- MobX para gestion de estados : https://mobx.netlify.app/
+- SQFlite para la base de datos local SQLite: https://pub.dev/packages/sqflite
+- Floor para una mejor abstracion de SQLite: https://pub.dev/packages/floor
+- PokeAPI - https://pokeapi.co/
