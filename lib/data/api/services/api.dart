@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:pokedex/data/api/models/pokemon_data_default.dart';
+import 'package:pokedex/data/api/models/pokemon_location_area_encounters.dart';
 import 'package:pokedex/data/api/models/pokemon_urls.dart';
 
 class Api {
@@ -25,7 +26,7 @@ class Api {
     }
   }
 
-  static Future<PokemonDataDefault?> pokemon(int pokemonId) async {
+  static Future<PokemonDataDefault?> pokemon(dynamic pokemonId) async {
     final response = await http.get(
       Uri.parse(
         "$baseUrl$endPoint$pokemonId",
@@ -34,6 +35,22 @@ class Api {
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       return pokemonDataDefaultFromJson(response.body.toString());
+    } else {
+      throw Exception(
+        "Error haciendo la peticion a la PokeApi, StatusCode\t${response.statusCode}",
+      );
+    }
+  }
+
+  static Future<List<PokemonLocationAreaEncounters>?> pokemonLAE(String urlPLAE) async {
+    final response = await http.get(
+      Uri.parse(
+        urlPLAE,
+      ),
+      headers: {'Content-Type': 'application/json; charset=utf-8'},
+    );
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return pokemonLAEFromJson(response.body.toString());
     } else {
       throw Exception(
         "Error haciendo la peticion a la PokeApi, StatusCode\t${response.statusCode}",

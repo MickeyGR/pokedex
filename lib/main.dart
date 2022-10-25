@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'controllers/app_management.dart';
 import 'pages/home_page.dart';
-import 'pages/info_page.dart';
+import 'pages/pokeapi_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +46,7 @@ class Pokedex extends StatelessWidget {
         '/home': (context) => HomePage(
               aMgnt: appManagement,
             ),
-        '/info': (context) => const InfoPage(),
+        '/pokeapi': (context) => const PokeAPIPage(),
       },
       initialRoute: '/home',
     );

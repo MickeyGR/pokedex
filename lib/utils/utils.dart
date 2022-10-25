@@ -13,6 +13,7 @@ class Utils {
   }
 
   static Future<void> init(AppManagement aMgnt) async {
+    aMgnt.leakedPokemons = [];
     await PokemonsServices.refreshActions(aMgnt.isOffline);
     aMgnt.setAsyncPokemons();
   }

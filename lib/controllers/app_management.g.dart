@@ -90,6 +90,22 @@ mixin _$AppManagement on _AppManagement, Store {
     });
   }
 
+  late final _$leakedPokemonsAtom =
+      Atom(name: '_AppManagement.leakedPokemons', context: context);
+
+  @override
+  List<Pokemon>? get leakedPokemons {
+    _$leakedPokemonsAtom.reportRead();
+    return super.leakedPokemons;
+  }
+
+  @override
+  set leakedPokemons(List<Pokemon>? value) {
+    _$leakedPokemonsAtom.reportWrite(value, super.leakedPokemons, () {
+      super.leakedPokemons = value;
+    });
+  }
+
   late final _$setAsyncPokemonsAsyncAction =
       AsyncAction('_AppManagement.setAsyncPokemons', context: context);
 
@@ -105,7 +121,8 @@ isOffline: ${isOffline},
 connectivityStream: ${connectivityStream},
 asyncPokemonUrlsController: ${asyncPokemonUrlsController},
 pokemonUrls: ${pokemonUrls},
-pokemons: ${pokemons}
+pokemons: ${pokemons},
+leakedPokemons: ${leakedPokemons}
     ''';
   }
 }

@@ -24,25 +24,26 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: AnimatedSearchBar(
-          animationDuration: 150,
-          label: "Pokedex",
-          controller: _controller,
-          labelStyle: const TextStyle(fontSize: 16),
-          searchStyle: const TextStyle(color: Colors.white),
-          cursorColor: Colors.white,
-          searchDecoration: const InputDecoration(
-            hintText: "Buscar pokemon",
-            alignLabelWithHint: true,
-            fillColor: Colors.white,
-            focusColor: Colors.white,
-            hintStyle: TextStyle(color: Colors.white70),
-            border: InputBorder.none,
-          ),
-          onChanged: (value) {
-            //TODO: implementar filtro con MobX
-          },
-        ),
+        title: searchBar(),
+        actions: [
+          IconButton(
+            onPressed: () {
+              if (aMgnt.isOffline) {
+                final snackBar = SnackBar(
+            content: const Text("No se pueden hacer peticiones a la PokeApi sin internet"),
+            action: SnackBarAction(
+              label: 'Ok',
+              onPressed: () {},
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              } else {
+               Navigator.pushNamed(context, '/pokeapi');
+              }
+            },
+            icon: const Icon(Icons.search),
+          )
+        ],
       ),
       body: LiquidPullToRefresh(
         color: Colors.red,
@@ -66,9 +67,14 @@ class HomePage extends StatelessWidget {
           }
 
           return GridView.builder(
-            itemCount: aMgnt.pokemons!.length,
+            //Si los la lista de pokemones filtrados tiene datos muestro esa
+            itemCount: (aMgnt.leakedPokemons!.isNotEmpty)
+                ? aMgnt.leakedPokemons!.length
+                : aMgnt.pokemons!.length,
             itemBuilder: (BuildContext context, int index) {
-              Pokemon pokemon = aMgnt.pokemons![index];
+              Pokemon pokemon = (aMgnt.leakedPokemons!.isNotEmpty)
+                  ? aMgnt.leakedPokemons![index]
+                  : aMgnt.pokemons![index];
               return PokemonCard(pokemon: pokemon, index: index);
             },
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -80,4 +86,33 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  AnimatedSearchBar searchBar() {
+    return AnimatedSearchBar(
+      animationDuration: 150,
+      label: "Pokedex",
+      controller: _controller,
+      labelStyle: const TextStyle(fontSize: 16),
+      searchStyle: const TextStyle(color: Colors.white),
+      cursorColor: Colors.white,
+      searchIcon: const Icon(Icons.filter_list_alt),
+      searchDecoration: const InputDecoration(
+        hintText: "Filtrar pokemon",
+        alignLabelWithHint: true,
+        fillColor: Colors.white,
+        focusColor: Colors.white,
+        hintStyle: TextStyle(color: Colors.white70),
+        border: InputBorder.none,
+      ),
+      onChanged: (String buscar) {
+        filtrarPokemones(buscar);
+      },
+    );
+  }
+
+  filtrarPokemones(String busqueda) {
+    List<Pokemon> pokemons = aMgnt.pokemons!.where((p) {
+      return (p.name.toLowerCase().contains(busqueda.toLowerCase()));
+    }).toList();
+    aMgnt.leakedPokemons = pokemons;
+  }
 }

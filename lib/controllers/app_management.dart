@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:mobx/mobx.dart';
 import 'package:pokedex/data/api/models/pokemon_data_default.dart';
+import 'package:pokedex/data/api/models/pokemon_location_area_encounters.dart';
 import 'package:pokedex/data/api/models/pokemon_urls.dart';
 import 'package:pokedex/data/api/services/api.dart';
 import 'package:pokedex/data/db/services/pokemons_services.dart';
@@ -31,11 +32,15 @@ abstract class _AppManagement with Store {
   @observable
   List<Pokemon>? pokemons = ObservableList<Pokemon>();
 
+  @observable
+  List<Pokemon>? leakedPokemons = ObservableList<Pokemon>();
+
   @action
   Future<void> setAsyncPokemons() async {
     List<Pokemon> pkmsInDB = await PokemonsServices.pokemonsInDB;
     if (isOffline || pkmsInDB.isNotEmpty) {
       pokemons = pkmsInDB;
+      leakedPokemons = pkmsInDB;
     } else {
       asyncPokemonUrlsController = ObservableFuture(Api.pokemonUrls());
 
@@ -47,10 +52,12 @@ abstract class _AppManagement with Store {
           PokemonDataDefault? pokemonDD;
           String? type;
           String? abilities;
-          //TODO: Hacer peticion correspondiente a estos datos
-          String? involvesTo;
-          String? attacks;
           String? locationAreaEncounters;
+          // ignore: todo
+          //TODO: Hacer peticion correspondiente a estos datos
+          //String? involvesTo;
+          //String? attacks;
+          //--
           bool isError = false;
           try {
             pokemonDD = await Api.pokemon(pokemon.id!);
@@ -64,16 +71,27 @@ abstract class _AppManagement with Store {
               abilities =
                   pokemonDD.abilities!.map((a) => a.ability!.name!).toString();
               type = pokemonDD.types!.map((t) => t.type!.name!).toString();
-              //TODO: este dato contiene la url para obtener las locaciones - pokemonDD.locationAreaEncounters!
+              if (pokemonDD.locationAreaEncounters != null) {
+                try {
+                  List<PokemonLocationAreaEncounters>? pLAE =
+                      await Api.pokemonLAE(pokemonDD.locationAreaEncounters!);
+                  if (pLAE != null) {
+                    locationAreaEncounters =
+                        pLAE.map((a) => a.locationArea!.name).toString();
+                  }
+                } catch (e) {
+                  locationAreaEncounters = null;
+                }
+              }
             }
             pkms.add(
               Pokemon(
-                id: pokemon.id!,
-                name: pokemon.name!,
-                picture: "${Api.baseUrlPicture}${pokemon.id}.png",
-                abilities: abilities,
-                type: type,
-              ),
+                  id: pokemon.id!,
+                  name: pokemon.name!,
+                  picture: "${Api.baseUrlPicture}${pokemon.id}.png",
+                  abilities: abilities,
+                  type: type,
+                  locationAreaEncounters: locationAreaEncounters),
             );
             pokemons = pkms;
           }

@@ -9,11 +9,12 @@ String pokemonDataDefaulToJson(PokemonDataDefault data) =>
 class PokemonDataDefault {
   List<Abilities>? abilities;
   int? id;
+  String? name;
   String? locationAreaEncounters;
   List<Types>? types;
 
   PokemonDataDefault(
-      {this.abilities, this.id, this.locationAreaEncounters, this.types});
+      {this.abilities, this.id, this.name, this.locationAreaEncounters, this.types});
 
   PokemonDataDefault.fromJson(Map<String, dynamic> json) {
     if (json['abilities'] != null) {
@@ -23,6 +24,7 @@ class PokemonDataDefault {
       });
     }
     id = json['id'];
+    name = json['name'];
     locationAreaEncounters = json['location_area_encounters'];
     if (json['types'] != null) {
       types = <Types>[];
@@ -38,6 +40,7 @@ class PokemonDataDefault {
       data['abilities'] = abilities!.map((v) => v.toJson()).toList();
     }
     data['id'] = id;
+    data['name'] = name;
     data['location_area_encounters'] = locationAreaEncounters;
     if (types != null) {
       data['types'] = types!.map((v) => v.toJson()).toList();
